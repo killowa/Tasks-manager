@@ -37,7 +37,7 @@ func (sch *Scheduler) Schedule(task *models.Task, startTime time.Time) {
 		}
 		worker.Take(task)
 		worker.Start()
-		// workerPool.ReturnResource(worker)
+		workerPool.ReturnResource(worker)
 		 fmt.Println("Worker returned", worker.ID)
 	}
 	repository.GetInMemoryRepository().Store(task)

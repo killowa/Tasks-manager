@@ -18,7 +18,7 @@ var workerPool *WorkerPool = nil
 type Pool[T any] interface {
 	GetResource() (*T, error)
 	ReturnResource(*T) error
-	Kill(*T) error
+	Dispose(*T) error
 	Expired(*T) bool
 	create() (*T, error)
 }
@@ -28,7 +28,6 @@ func (workerPool *WorkerPool) GetResource() (*Worker, error) {
 		for workerID := range workerPool.free {
 			if workerPool.IsDead(workerID) {
 				workerPool.Dispose(workerID)
-				delete(workerPool.free, workerID)
 				continue
 			}
 
@@ -46,6 +45,10 @@ func (workerPool *WorkerPool) GetResource() (*Worker, error) {
 
 func (workerPool *WorkerPool) Dispose(workerID string) {
 	workerPool.workers[workerID].Stop()
+	workerPool.deleteFromPool(workerID)
+}
+
+func (workerPool *WorkerPool) deleteFromPool(workerID string) {
 	delete(workerPool.workers, workerID)
 	delete(workerPool.free, workerID)
 	delete(workerPool.allocated, workerID)

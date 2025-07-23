@@ -30,16 +30,13 @@ func NewWorker() *Worker {
 }
 
 func (w *Worker) Start() {
-	fmt.Println("worker started")
 	go func() {
-		fmt.Println("worker started")
 		for {
 			select {
 			case <-w.ctx.Done():
 				fmt.Println("worker stopped")
 				return
 			case task := <-w.tasksQueue:
-				fmt.Println("task in queue", task.Name)
 				err := task.Command(task.Context)
 				if err != nil {
 					fmt.Printf("Task %s failed: %v\n", task.Name, err)
@@ -49,7 +46,6 @@ func (w *Worker) Start() {
 			}
 		}
 	}()
-	fmt.Println("worker ended")
 }
 func (w *Worker) Take(task *models.Task) error {
 	w.tasksQueue <- task
